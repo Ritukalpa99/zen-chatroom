@@ -54,7 +54,7 @@ const fetchChats = asyncHandler(async (req, res) => {
 		})
 			.populate("users", "-password")
 			.populate("groupAdmin", "-password")
-			// .populate("latestMesssage")
+			.populate("latestMessage")
 			.sort({ updatedAt: -1 });
 
 		result = await User.populate(result, {
@@ -63,7 +63,10 @@ const fetchChats = asyncHandler(async (req, res) => {
 		});
 		// console.log(result);
 		res.send(result);
-	} catch (error) {}
+	} catch (error) {
+		res.status(400);
+		throw new Error(error.message);
+	}
 });
 
 const createGroupChat = asyncHandler(async (req, res) => {
