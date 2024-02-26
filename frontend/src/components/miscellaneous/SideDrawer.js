@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
 	Avatar,
+	Badge ,
 	Box,
 	Button,
 	Drawer,
@@ -28,6 +29,7 @@ import ProfileModal from "./ProfileModal";
 import { useNavigate } from "react-router-dom";
 import ChatLoading from "../ChatLoading";
 import UserListItem from "../UserAvatar/UserListItem";
+import { getSender } from "../../config/ChatLogics";
 
 const SideDrawer = () => {
 	const [search, setSearch] = useState("");
@@ -39,7 +41,7 @@ const SideDrawer = () => {
 
 	const { isOpen, onOpen,  onClose } = useDisclosure();
 
-	const { user, setSelectedChat, chats,setChats } = ChatState();
+	const { user, setSelectedChat, chats,setChats,notfication, setNotification } = ChatState();
 
 	const logoutHandler = () => {
 		localStorage.removeItem("userInfo");
@@ -139,9 +141,22 @@ const SideDrawer = () => {
 				<div>
 					<Menu>
 						<MenuButton p={1}>
+							<Badge colorScheme="red">{notfication.length === 0 ? null : notfication.length}</Badge>
 							<BellIcon fontSize="2xl" m="1" />
 						</MenuButton>
-						{/* <MenuList></MenuList> */}
+						<MenuList pl={2} >
+							{!notfication.length && "No New Messages"}
+							{notfication.map((notif) => (
+								<MenuItem key={notif._id}
+								onClick={() => {
+									setSelectedChat(notif.chat)
+									setNotification(notfication.filter((n) => n !== notif));
+								}}
+								>
+									{notif.chat.isGroupChat? `New Message in ${notif.chat.chatName}` : `New Message from ${getSender(user, notif.chat.users)}`}
+								</MenuItem>
+							))}
+						</MenuList>
 					</Menu>
 					<Menu>
 						<MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
